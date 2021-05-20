@@ -31,7 +31,7 @@ public class Bot extends TelegramLongPollingBot {
                     message.setText(update.getMessage().getText());
             switch (update.getMessage().getText()){
                 case "/start":{
-                    message.setText("What?");
+                    message.setText("Hi?");
                 }
                 break;
                 default:
