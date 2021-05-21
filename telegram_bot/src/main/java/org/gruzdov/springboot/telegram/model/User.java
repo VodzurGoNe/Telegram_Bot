@@ -13,37 +13,34 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import static javax.persistence.FetchType.EAGER;
-
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "chat_id"
-        , name = "users_unique_chatid_idx")})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "chat_id",
+        name = "users_unique_chatid_idx")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class User extends AbstractBaseEntity {
-    @Column(name = "chat_id", unique = true, nullable = false)
     @NotNull
+    @Column(name = "chat_id", unique = true, nullable = false)
     private Long chatId;
 
-    @Column(name = "name", unique = true, nullable = false)
     @NotBlank
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @Column(name = "csore", nullable = false)
     @NotNull
+    @Column(name = "csore", nullable = false)
     private Integer score;
 
-    @Column(name = "high_score", nullable = false)
     @NotNull
+    @Column(name = "high_score", nullable = false)
     private Integer highScore;
 
-    @Column(name = "bot_state", nullable = false)
     @NotBlank
+    @Column(name = "bot_state", nullable = false)
     private State botState;
 
-    // Конструктор нужен для создания нового пользователя
     public User(Long chatId) {
         this.chatId = chatId;
         this.name = String.valueOf(chatId);

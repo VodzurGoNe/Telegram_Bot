@@ -35,7 +35,6 @@ public class RegistrationHandler implements Handler {
             return accept(user);
         else if (message.equalsIgnoreCase(NAME_CHANGE))
             return changeName(user);
-
         return checkName(user, message);
     }
 
@@ -53,20 +52,14 @@ public class RegistrationHandler implements Handler {
         // Если пользователь принял имя - меняем статус и сохраняем
         user.setBotState(State.NONE);
         userRepository.save(user);
-
         // Создаем кнопку для начала игры
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
         List<InlineKeyboardButton> inlineKeyboardButtonsRowOne =
                 List.of(createInlineKeyboardButton("Start quiz0", QUIZ_START));
-
         inlineKeyboardMarkup.setKeyboard(List.of(inlineKeyboardButtonsRowOne));
-
         SendMessage sendMessage = createMessageTemplate(user);
-
-        sendMessage.setText(String.format("Your name is saved as: %s",user.getName()));
+        sendMessage.setText(String.format("Your name is saved as: %s", user.getName()));
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
-
         return List.of(sendMessage);
     }
 
@@ -75,21 +68,15 @@ public class RegistrationHandler implements Handler {
         // идея для рефакторинга - добавить временное хранение имени
         user.setName(message);
         userRepository.save(user);
-
         // Делаем кнопку для применения изменений
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
-        List<InlineKeyboardButton> inlineKeyboardButtonsRowOne = List.of(
-                createInlineKeyboardButton("Accept", NAME_ACCEPT));
-
+        List<InlineKeyboardButton> inlineKeyboardButtonsRowOne = List.of(createInlineKeyboardButton("Accept",
+                NAME_ACCEPT));
         inlineKeyboardMarkup.setKeyboard(List.of(inlineKeyboardButtonsRowOne));
-
         SendMessage sendMessage = createMessageTemplate(user);
-
-        sendMessage.setText(String.format("You have entered: %s%nIf this is correct - press the button"
-                , user.getName()));
+        sendMessage.setText(String.format("You have entered: %s%nIf this is correct - press the button",
+                user.getName()));
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
-
         return List.of(sendMessage);
     }
 
@@ -99,19 +86,13 @@ public class RegistrationHandler implements Handler {
         userRepository.save(user);
         // Создаем кнопку для отмены операции
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
         List<InlineKeyboardButton> inlineKeyboardButtonsRowOne = List.of(
                 createInlineKeyboardButton("Cancel", NAME_CHANGE_CANCEL));
-
         inlineKeyboardMarkup.setKeyboard(List.of(inlineKeyboardButtonsRowOne));
-
         SendMessage sendMessage = createMessageTemplate(user);
-
-        sendMessage.setText(String.format(
-                "Your current name is: %s%nEnter new name or press the button to continue"
-                , user.getName()));
+        sendMessage.setText(String.format("Your current name is: %s%nEnter new name or press the button to continue",
+                user.getName()));
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
-
         return List.of(sendMessage);
     }
 }

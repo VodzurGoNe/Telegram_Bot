@@ -14,7 +14,6 @@ public class TelegramUtil {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.enableMarkdown(true);
-
         return sendMessage;
     }
 
@@ -23,7 +22,6 @@ public class TelegramUtil {
         InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
         inlineKeyboardButton.setText(text);
         inlineKeyboardButton.setCallbackData(command);
-
         return inlineKeyboardButton;
     }
 }

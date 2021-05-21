@@ -1,11 +1,13 @@
 package org.gruzdov.springboot.telegram.bot.handler;
 
+import lombok.NonNull;
 import org.gruzdov.springboot.telegram.bot.State;
 import org.gruzdov.springboot.telegram.model.Question;
 import org.gruzdov.springboot.telegram.model.User;
 import org.gruzdov.springboot.telegram.repository.JpaQuestionRepository;
 import org.gruzdov.springboot.telegram.repository.JpaUserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -56,7 +58,6 @@ public class QuizHandler implements Handler {
         final int currentScore = user.getScore() + 1;
         user.setScore(currentScore);
         userRepository.save(user);
-
         return nextQuestion(user);
     }
 
@@ -70,80 +71,64 @@ public class QuizHandler implements Handler {
         user.setScore(0);
         user.setBotState(State.NONE);
         userRepository.save(user);
-
         // Создаем кнопку для повторного начала игры
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
         List<InlineKeyboardButton> inlineKeyboardButtonsRowOne = List.of(
                 createInlineKeyboardButton("Try again?", QUIZ_START));
-
         inlineKeyboardMarkup.setKeyboard(List.of(inlineKeyboardButtonsRowOne));
-
         SendMessage sendMessage = createMessageTemplate(user);
-
         sendMessage.setText(String.format("Incorrect!%nYou scored *%d* points!", currentScore));
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
-
         return List.of(sendMessage);
     }
 
     private List<PartialBotApiMethod<? extends Serializable>> startNewQuiz(User user) {
         user.setBotState(State.PLAYING_QUIZ);
         userRepository.save(user);
-
         return nextQuestion(user);
     }
 
     private List<PartialBotApiMethod<? extends Serializable>> nextQuestion(User user) {
         Question question = questionRepository.getRandomQuestion();
-
         // Собираем список возможных вариантов ответа
-        List<String> options = new ArrayList<>(List.of(question.getCorrectAnswer()
-                , question.getOptionOne()
-                , question.getOptionTwo()
-                , question.getOptionThree()));
+        List<String> options = new ArrayList<>(List.of(
+                question.getCorrectAnswer(), question.getOptionOne(), question.getOptionTwo(), question.getOptionThree()
+        ));
         // Перемешиваем
         Collections.shuffle(options);
-
         // Начинаем формировать сообщение с вопроса
         StringBuilder sb = new StringBuilder();
-        sb.append('*')
-                .append(question.getQuestion())
-                .append("*\n\n");
-
-
+        sb.append('*').append(question.getQuestion()).append("*\n\n");
         // Создаем два ряда кнопок
         List<InlineKeyboardButton> inlineKeyboardButtonsRowOne = new ArrayList<>();
         List<InlineKeyboardButton> inlineKeyboardButtonsRowTwo = new ArrayList<>();
-
         // Формируем сообщение и записываем CallBackData на кнопки
         for (int i = 0; i < options.size(); i++) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-
             final String callbackData =
-                    options.get(i).equalsIgnoreCase(question.getCorrectAnswer())
-                            ? QUIZ_CORRECT : QUIZ_INCORRECT;
-
+                    options.get(i).equalsIgnoreCase(question.getCorrectAnswer()) ? QUIZ_CORRECT : QUIZ_INCORRECT;
             button.setText(OPTIONS.get(i));
             button.setCallbackData(String.format("%s %d", callbackData, question.getId()));
-
             if (i < 2) {
                 inlineKeyboardButtonsRowOne.add(button);
             } else {
                 inlineKeyboardButtonsRowTwo.add(button);
             }
-            sb.append(OPTIONS.get(i) + ". " + options.get(i));
+            sb.append(OPTIONS.get(i)).append(". ").append(options.get(i));
             sb.append("\n");
         }
-
         SendMessage sendMessage = createMessageTemplate(user);
-
         sendMessage.setText(sb.toString());
-        sendMessage.setReplyMarkup(new InlineKeyboardMarkup());
-
+        @NonNull List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        keyboard.add(inlineKeyboardButtonsRowOne);
+        keyboard.add(inlineKeyboardButtonsRowTwo);
+        InlineKeyboardMarkup markupKeyboard = new InlineKeyboardMarkup();
+        markupKeyboard.setKeyboard(keyboard);
+        sendMessage.setReplyMarkup(markupKeyboard);
         return List.of(sendMessage);
     }
 
+    @Nullable
     @Override
     public State operatedBotState() {
         return null;
