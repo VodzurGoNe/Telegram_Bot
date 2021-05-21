@@ -1,57 +1,55 @@
 package org.gruzdov.springboot.telegram.bot;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.Serializable;
+import java.util.List;
+
+@Slf4j
 @Component
 // Наследуемся от TelegramLongPollingBot - абстрактного класса Telegram API
 public class Bot extends TelegramLongPollingBot {
     // Аннотация @Value позволяет задавать значение полю путем считывания из application.yaml
     @Value("${bot.name}")
+    @Getter
     private String botUsername;
 
     @Value("${bot.token}")
+    @Getter
     private String botToken;
 
-    /* Перегружаем метод интерфейса LongPollingBot
-    Теперь при получении сообщения наш бот будет отвечать сообщением Hi!
-     */
+    private final UpdateReceiver updateReceiver;
+
+    public Bot(UpdateReceiver updateReceiver) {
+        this.updateReceiver = updateReceiver;
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
-        // We check if the update has a message and the message has text
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage message = new SendMessage();
-                    message.setChatId(String.valueOf(update.getMessage().getChatId()));// Create a SendMessage object with mandatory fields
-                    //.setChatId(update.getMessage().getChatId())
-                    message.setReplyToMessageId(update.getMessage().getMessageId());
-                    message.setText(update.getMessage().getText());
-            switch (update.getMessage().getText()){
-                case "/start":{
-                    message.setText("Hi?");
-                }
-                break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + update.getMessage().getText());
-            }
-            try {
-                execute(message); // Call method to send the message
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+        List<PartialBotApiMethod<? extends Serializable>> messagesToSend
+                = updateReceiver.handle(update);
+
+        if (messagesToSend != null && !messagesToSend.isEmpty()) {
+            messagesToSend.forEach(response -> {
+                if (response instanceof SendMessage)
+                    executeWithExceptionCheck((SendMessage) response);
+            });
         }
     }
 
-    // Геттеры, которые необходимы для наследования от TelegramLongPollingBot
-    public String getBotUsername() {
-        return botUsername;
+    private void executeWithExceptionCheck(SendMessage sendMessage) {
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            log.error("oops");
+        }
     }
-
-    public String getBotToken() {
-        return botToken;
-    }
-
 }

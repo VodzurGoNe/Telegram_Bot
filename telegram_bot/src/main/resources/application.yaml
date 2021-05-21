@@ -1,3 +1,14 @@
 bot:
-  name:
-  token:
+  name: hamstercall_bot
+  token: 1519316159:AAHseXN1VC7UQk_fBnYMRop2W4N3Bskrx8g
+
+spring:
+    datasource:
+      url: jdbc:postgresql://ec2-54-74-35-87.eu-west-1.compute.amazonaws.com:5432/d3dhh6cvcifb0l?user=coeotiljjpaiip&password=52684d80ad0d52db2a9ffd9b5ed6a91d3fa349d4a30ff1a7478514136d412e95
+      driver-class-name: org.postgresql.Driver
+      initialization-mode: never
+    jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      show-sql: true
+      hibernate:
+        ddl-auto: update
