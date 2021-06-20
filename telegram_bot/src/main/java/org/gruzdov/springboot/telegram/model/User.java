@@ -13,13 +13,13 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "chat_id",
-        name = "users_unique_chatid_idx")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "chat_id",
+        name = "users_unique_chatid_idx")})
 public class User extends AbstractBaseEntity {
     @NotNull
     @Column(name = "chat_id", unique = true, nullable = false)
