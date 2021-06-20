@@ -7,31 +7,31 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
-@Entity
-@Table(name = "java_quiz")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
+@Entity
+@Table(name = "java_quiz")
 public class Question extends AbstractBaseEntity {
-    @Column(name = "question", nullable = false)
     @NotBlank
+    @Column(name = "question", nullable = false)
     private String question;
 
-    @Column(name = "answer_correct", nullable = false)
     @NotBlank
+    @Column(name = "answer_correct", nullable = false)
     private String correctAnswer;
 
-    @Column(name = "option2", nullable = false)
     @NotBlank
+    @Column(name = "option2", nullable = false)
     private String optionOne;
 
-    @Column(name = "option1", nullable = false)
     @NotBlank
+    @Column(name = "option1", nullable = false)
     private String optionTwo;
 
-    @Column(name = "option3", nullable = false)
     @NotBlank
+    @Column(name = "option3", nullable = false)
     private String optionThree;
 }

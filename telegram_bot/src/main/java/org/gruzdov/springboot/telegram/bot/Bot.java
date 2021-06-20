@@ -17,13 +17,13 @@ import java.util.List;
 @Component
 // Наследуемся от TelegramLongPollingBot - абстрактного класса Telegram API
 public class Bot extends TelegramLongPollingBot {
+    @Getter
     // Аннотация @Value позволяет задавать значение полю путем считывания из application.yaml
     @Value("${bot.name}")
-    @Getter
     private String botUsername;
 
-    @Value("${bot.token}")
     @Getter
+    @Value("${bot.token}")
     private String botToken;
 
     private final UpdateReceiver updateReceiver;
@@ -47,7 +47,7 @@ public class Bot extends TelegramLongPollingBot {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            log.error("oops");
+            log.error("oops !");
         }
     }
 }
